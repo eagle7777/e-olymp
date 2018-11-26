@@ -208,7 +208,7 @@ if __name__ == '__main__':
         Q = int(input())  # кол-во ударов молнии
         for i in range(Q):
             A, B, C = map(int, input().split())
-            verticesOnWay = T.findWay(treeNodes[A], treeNodes[B])  # находим все вершины на пути
+            verticesOnWay = T.findWay(treeNodes[A], treeNodes[B])  # находим все вершины на пути из A в B
             for v in verticesOnWay:
                 v.data += C  # и каждой прибавляем энергию C
         # вывод
