@@ -3,6 +3,8 @@
 # Author: Valentyn Kofanov (knu)
 # Created: 11/28/18
 
+import random
+
 
 class Matrix:
     """
@@ -11,9 +13,12 @@ class Matrix:
     def __init__(self, l=list()):
         """
         коснтруктор
-        матрица задается списком или списком списков
+        матрица задается списком (вектор) или списком списков (матрица)
         :param l:
         """
+        if not isinstance(l[0], list):
+            for i in range(len(l)):
+                l[i] = [l[i]]
         self.m = l
 
     def __getitem__(self, item):
@@ -63,7 +68,7 @@ class Matrix:
         res.rstrip('\n')
         return res
 
-    def getMatrixSize(self):
+    def shape(self):
         """
         возвращает размер матрицы
         :return: кортеж (n, k) матрицы nxk
@@ -104,8 +109,8 @@ class Matrix:
         :param other:
         :return: результат матричного сложения
         """
-        n, k = self.getMatrixSize()
-        n2, k2 = other.getMatrixSize()
+        n, k = self.shape()
+        n2, k2 = other.shape()
         assert n == n2 and k == k2, 'INVALID matrix size'
         new = Matrix.zeros(n, k)
         for i in range(n):
@@ -119,8 +124,8 @@ class Matrix:
         :param other:
         :return:
         """
-        n, k = self.getMatrixSize()
-        n2, k2 = other.getMatrixSize()
+        n, k = self.shape()
+        n2, k2 = other.shape()
         assert n == n2 and k == k2, 'INVALID matrix size'
         new = Matrix.zeros(n, k)
         for i in range(n):
@@ -133,7 +138,7 @@ class Matrix:
         возвращает транспонированную матрицу
         :return:
         """
-        n, k = self.getMatrixSize()
+        n, k = self.shape()
         new = Matrix.zeros(k, n)
         for i in range(n):
             for j in range(k):
@@ -146,8 +151,8 @@ class Matrix:
         :param other:
         :return: True, если две матрицы равны (поэлементно) / False, в противном случае
         """
-        n, k = self.getMatrixSize()
-        n2, k2 = other.getMatrixSize()
+        n, k = self.shape()
+        n2, k2 = other.shape()
         assert n == n2 and k == k2, 'INVALID matrix size'
         success = True
         for i in range(n):
@@ -163,18 +168,44 @@ class Matrix:
         :param other:
         :return:
         """
-        n1, k1 = self.getMatrixSize()
-        k2, m2 = other.getMatrixSize()
+        n1, k1 = self.shape()
+        k2, m2 = other.shape()
         assert k1 == k2, 'INVALID matrix size'
         new = Matrix.zeros(n1, m2)
-        other_tran = other.transpose()
         for i in range(n1):
-            new[i] = [self[i][j] * other_tran[i][j] for j in range(m2)]
+            for j in range(k1):
+                for k in range(m2):
+                    new[i][k] += self[i][j] * other[j][k]
         return new
 
+    def __pow__(self, power):
+        """
+        возведение матрицы в степень
+        :param power: степень
+        :return:
+        """
+        new = Matrix(self.m)
+        for i in range(power-1):
+            new *= self
+        return new
 
-if __name__ == '__main__':
-    m1 = [[2, 0, 4, -1], [1, -1, 1, 0]]
-    m2 = [[2], [1], [0], [-2]]
-    a = Matrix(m1)
-    b = Matrix(m2)
+    def __hash__(self):
+        return str.__hash__(str(self.m))
+
+    @staticmethod
+    def getRandomMatrix(n=None, m=None):
+        """
+        возвращает рандомную матрицу
+        n и m размеры
+        :param n: если не задано, то случайное
+        :param m: если не задано, то случайное
+        :return:
+        """
+        if not n or not m:
+            n = random.randint(1, 30)
+            m = random.randint(1, 30)
+        new = Matrix.zeros(n, m)
+        for i in range(n):
+            for j in range(m):
+                new[i][j] = random.randint(-100, 100)
+        return new
