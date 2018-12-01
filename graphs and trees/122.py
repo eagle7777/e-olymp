@@ -187,8 +187,13 @@ class Matrix:
         :return:
         """
         new = Matrix(self.m)
+        n = self.shape()[0]
         for i in range(power-1):
             new *= self
+            for k in range(n):
+                for j in range(n):
+                    if k == j:
+                        new[k][j] = 1
         return new
 
     def __hash__(self):
